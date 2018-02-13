@@ -18,4 +18,34 @@ class LibraryTest < Minitest::Test
   def test_that_it_has_a_version_number
     refute_nil ::OpenCensus::Stackdriver::VERSION
   end
+
+  def test_e2e
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+    exporter = OpenCensus::Trace::Exporters::Stackdriver.new
+    OpenCensus::Trace.configure do |config|
+      config.exporter = exporter
+      config.default_sampler = OpenCensus::Trace::Samplers::AlwaysSample.new
+    end
+    OpenCensus::Trace.start_request_trace do |root_context|
+      OpenCensus::Trace.in_span("span1") do |span1|
+        span1.put_attribute :data, "Outer span"
+        sleep 0.1
+        OpenCensus::Trace.in_span("span2") do |span2|
+          span2.put_attribute :data, "Inner span"
+          sleep 0.2
+        end
+        OpenCensus::Trace.in_span("span3") do |span3|
+          span3.put_attribute :data, "Another inner span"
+          sleep 0.1
+        end
+      end
+      exporter.export root_context.build_contained_spans
+    end
+    OpenCensus::Trace.start_request_trace do |root_context|
+      OpenCensus::Trace.in_span("span4") do |span4|
+        span4.put_attribute :data, "Fast span"
+      end
+      exporter.export root_context.build_contained_spans
+    end
+  end
 end
