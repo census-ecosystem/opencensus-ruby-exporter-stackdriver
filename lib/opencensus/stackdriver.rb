@@ -22,3 +22,4 @@ end
 
 require "opencensus/stackdriver/version"
 require "opencensus/trace/exporters/stackdriver"
+require "opencensus/trace/exporters/stackdriver/converter"
