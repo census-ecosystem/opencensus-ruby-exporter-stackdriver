@@ -16,7 +16,9 @@ require "test_helper"
 
 describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
   let(:project_id) { "my-project" }
-  let(:converter) { OpenCensus::Trace::Exporters::Stackdriver::Converter.new }
+  let(:converter) {
+    OpenCensus::Trace::Exporters::Stackdriver::Converter.new project_id
+  }
   let(:simple_string) { "hello" }
   let(:string_truncated_bytes) { 6 }
   let(:truncatable_string) {
@@ -221,7 +223,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
         status: status,
         same_process_as_parent_span: true,
         child_span_count: 6
-      proto = converter.convert_span span, project_id
+      proto = converter.convert_span span
       proto.name.must_equal "projects/#{project_id}/traces/#{trace_id}/spans/#{span_id}"
       proto.span_id.must_equal span_id
       proto.parent_span_id.must_equal span_id2
@@ -262,8 +264,8 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
         status: status,
         same_process_as_parent_span: true,
         child_span_count: 6
-      proto1 = converter.convert_span span, project_id
-      proto2 = converter.convert_span span, project_id
+      proto1 = converter.convert_span span
+      proto2 = converter.convert_span span
       proto1.stack_trace.stack_frames.wont_be_nil
       proto2.stack_trace.stack_frames.must_be_nil
       proto2.stack_trace.stack_trace_hash_id.must_equal proto1.stack_trace.stack_trace_hash_id

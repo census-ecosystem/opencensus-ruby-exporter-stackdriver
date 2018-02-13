@@ -13,7 +13,7 @@
 # limitations under the License.
 
 require "google/devtools/cloudtrace/v2/trace_pb"
-require 'google/protobuf/well_known_types'
+require "google/protobuf/well_known_types"
 
 module OpenCensus
   module Trace
@@ -40,7 +40,10 @@ module OpenCensus
           ##
           # Create a converter
           #
-          def initialize
+          # @param [String] project_id Google project ID
+          #
+          def initialize project_id
+            @project_id = project_id
             @stack_trace_hash_ids = {}
           end
 
@@ -50,13 +53,12 @@ module OpenCensus
           # Convert a span object.
           #
           # @param [OpenCensus::Trace::Span] obj OpenCensus span object
-          # @param [String] project_id Google project ID
           # @return [Google::Devtools::Cloudtrace::V2::Span] The generated
           #     proto
           #
-          def convert_span obj, project_id
+          def convert_span obj
             TraceProtos::Span.new \
-              name: make_resource_name(project_id, obj.trace_id, obj.span_id),
+              name: make_resource_name(@project_id, obj.trace_id, obj.span_id),
               span_id: obj.span_id,
               parent_span_id: obj.parent_span_id,
               display_name: convert_truncatable_string(obj.name),
@@ -302,7 +304,7 @@ module OpenCensus
           ##
           # Convert a list of link objects
           #
-          # @param [Array<OpenCensus::Trace::Link>] link The link objects to
+          # @param [Array<OpenCensus::Trace::Link>] links The link objects to
           #     convert
           # @param [Integer] dropped_links_count Number of dropped links
           # @return [Google::Devtools::Cloudtrace::V2::Span::Links] The
