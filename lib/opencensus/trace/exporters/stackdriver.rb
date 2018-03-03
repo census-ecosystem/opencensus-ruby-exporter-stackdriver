@@ -102,7 +102,7 @@ module OpenCensus
         #     export to Stackdriver
         #
         def export spans
-          @client_future.execute if @client_future.unscheduled?
+          @client_future.execute
           task = proc {
             export_as_batch(@client_future.value, spans)
           }
