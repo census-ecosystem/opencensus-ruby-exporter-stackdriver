@@ -85,7 +85,7 @@ module OpenCensus
             terminate_at_exit! @executor, auto_terminate_time
           end
 
-          @client_future = create_client_future \
+          @client_promise = create_client_promise \
             @executor, credentials, scope, client_config, timeout, mock_client
         end
 
@@ -102,15 +102,13 @@ module OpenCensus
         #     export to Stackdriver
         #
         def export spans
-          @client_future.execute
-          task = proc {
-            export_as_batch(@client_future.value, spans)
-          }
-          if @executor.post(&task)
-            self
-          else
-            raise "Exporter is no longer running"
+          raise "Exporter is no longer running" unless @executor.running?
+
+          @client_promise.execute
+          @client_promise.then do |client|
+            export_as_batch(client, spans)
           end
+          self
         end
 
         ##
@@ -191,13 +189,13 @@ module OpenCensus
           end
         end
 
-        # Create the client future.
+        # Create the client promise.
         # We create the client lazily so grpc doesn't get initialized until
         # we actually need it. This is important because if it is intialized
         # too early, before a fork, it can go into a bad state.
-        def create_client_future executor, credentials, scopes, client_config,
-                                 timeout, mock = nil
-          Concurrent::Future.new executor: executor do
+        def create_client_promise executor, credentials, scopes, client_config,
+                                  timeout, mock = nil
+          Concurrent::Promise.new executor: executor do
             mock || Google::Cloud::Trace::V2.new(
               credentials: credentials,
               scopes: scopes,
