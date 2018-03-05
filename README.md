@@ -6,7 +6,7 @@ This library exports OpenCensus data to Stackdriver.
 
 ### Supported Ruby Versions
 
-This library is supported on Ruby 2.0+.
+This library is supported on Ruby 2.2+.
 
 However, Ruby 2.3 or later is strongly recommended, as earlier releases have
 reached or are nearing end-of-life. After June 1, 2018, OpenCensus will provide
