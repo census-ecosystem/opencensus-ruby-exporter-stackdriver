@@ -75,18 +75,22 @@ module OpenCensus
             mock_client: nil
           @project_id = final_project_id project_id
 
-          credentials = final_credentials credentials, scope
-          scope ||= Google::Cloud.configure.trace.scope
-          timeout ||= Google::Cloud.configure.trace.timeout
-          client_config ||= Google::Cloud.configure.trace.client_config
-
           @executor = create_executor max_threads, max_queue
           if auto_terminate_time
             terminate_at_exit! @executor, auto_terminate_time
           end
 
-          @client_promise = create_client_promise \
-            @executor, credentials, scope, client_config, timeout, mock_client
+          if mock_client
+            @client_promise =
+              Concurrent::Promise.fulfill mock_client, executor: @executor
+          else
+            credentials = final_credentials credentials, scope
+            scope ||= Google::Cloud.configure.trace.scope
+            timeout ||= Google::Cloud.configure.trace.timeout
+            client_config ||= Google::Cloud.configure.trace.client_config
+            @client_promise = create_client_promise \
+              @executor, credentials, scope, client_config, timeout
+          end
         end
 
         ##
@@ -194,9 +198,9 @@ module OpenCensus
         # we actually need it. This is important because if it is intialized
         # too early, before a fork, it can go into a bad state.
         def create_client_promise executor, credentials, scopes, client_config,
-                                  timeout, mock = nil
+                                  timeout
           Concurrent::Promise.new executor: executor do
-            mock || Google::Cloud::Trace::V2.new(
+            Google::Cloud::Trace::V2.new(
               credentials: credentials,
               scopes: scopes,
               client_config: client_config,

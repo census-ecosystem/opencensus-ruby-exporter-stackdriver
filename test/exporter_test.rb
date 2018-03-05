@@ -48,8 +48,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver do
 
     exporter = OpenCensus::Trace::Exporters::Stackdriver.new \
       project_id: project_id,
-      mock_client: mock_client,
-      credentials: :dummy_credentials
+      mock_client: mock_client
 
     exporter.export [span1, span2]
     exporter.shutdown
