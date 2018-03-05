@@ -60,7 +60,7 @@ module OpenCensus
             TraceProtos::Span.new \
               name: make_resource_name(@project_id, obj.trace_id, obj.span_id),
               span_id: obj.span_id,
-              parent_span_id: obj.parent_span_id,
+              parent_span_id: obj.parent_span_id || "",
               display_name: convert_truncatable_string(obj.name),
               start_time: convert_time(obj.start_time),
               end_time: convert_time(obj.end_time),
