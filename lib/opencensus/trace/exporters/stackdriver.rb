@@ -109,10 +109,14 @@ module OpenCensus
           raise "Exporter is no longer running" unless @executor.running?
 
           @client_promise.execute
-          @client_promise.then do |client|
+          export_promise = @client_promise.then do |client|
             export_as_batch(client, spans)
           end
-          self
+          export_promise.on_error do |reason|
+            warn "Unable to export to Stackdriver because: #{reason}"
+          end
+
+          true
         end
 
         ##
