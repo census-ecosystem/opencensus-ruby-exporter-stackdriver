@@ -1,6 +1,86 @@
 # Ruby Stackdriver Exporter for OpenCensus
 
-This library exports OpenCensus data to Stackdriver.
+This repository contains the source to the `opencensus-stackdriver` gem. This
+library is a plugin for
+[Ruby OpenCensus](https://github.com/census-instrumentation/opencensus-ruby)
+that exports data to [Stackdriver](https://cloud.google.com/stackdriver/).
+
+OpenCensus is a platform- and provider-agnostic framework for distributed
+tracing and stats collection. For more information, see https://opencensus.io.
+
+This library is in an alpha stage, and the API is subject to change.
+
+## Quick Start
+
+### Installation
+
+Install the gem using Bundler:
+
+1. Add the `opencensus-stackdriver` gem to your application's Gemfile:
+
+```ruby
+gem "opencensus-stackdriver"
+```
+
+2. Use Bundler to install the gem:
+
+```sh
+$ bundle install
+```
+
+The core `opencensus` gem and the `google-cloud-trace` client library for the
+Stackdriver API, will be installed automatically as dependencies.
+
+### Installing the plugin
+
+The Stackdriver plugin can be installed using OpenCensus configuration.
+Insert the following code in your application's initialization:
+
+```ruby
+OpenCensus.configure do |c|
+  c.trace.exporter = OpenCensus::Trace::Exporters::Stackdriver.new
+end
+```
+
+If you are using **Ruby on Rails**, you can equivalently include this code in
+your Rails config:
+
+```ruby
+config.opencensus.trace.exporter = OpenCensus::Trace::Exporters::Stackdriver.new
+```
+
+See the documentation for
+[OpenCensus::Trace::Exporters::Stackdriver](http://www.rubydoc.info/gems/opencensus-stackdriver/OpenCensus/Trace/Exporters/Stackdriver)
+for information on the configuration options for the Stackdriver exporter.
+
+You can find more general information on using OpenCensus from Ruby, including
+configuring automatic trace capture and adding custom spans, in the
+[core `opencensus` README](https://github.com/census-instrumentation/opencensus-ruby).
+
+### Connecting to Stackdriver
+
+If you do not have a Google Cloud project, create one from the
+[cloud console](https://console.cloud.google.com/).
+
+The Stackdriver plugin needs credentials for your project in order to export
+traces to the Stackdriver backend. If your application is running in Google
+Cloud Platform hosting (i.e.
+[Google App Engine](https://cloud.google.com/appengine/),
+[Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/), or
+[Google Compute Engine](https://cloud.google.com/compute/)), then the plugin
+can generally retrieve the needed credentials automatically from the runtime
+environment. See
+[this section](https://github.com/GoogleCloudPlatform/google-cloud-ruby/tree/master/google-cloud-trace#running-on-google-cloud-platform)
+from the `google-cloud-trace` README for details.
+
+If you are running the application locally, in self-hosted VMs, or a third
+party hosting service, you will need to provide the project ID and credentials
+(keyfile) to the Google Cloud client library. See
+[this section](https://github.com/GoogleCloudPlatform/google-cloud-ruby/tree/master/google-cloud-trace#running-locally-and-elsewhere)
+for details.
+
+Either way, once you have the Stackdriver exporter configured, you can view
+traces on the [Google Cloud Console](https://console.cloud.google.com/traces).
 
 ## About the library
 
