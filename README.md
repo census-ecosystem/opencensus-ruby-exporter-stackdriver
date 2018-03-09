@@ -29,7 +29,7 @@ $ bundle install
 ```
 
 The core `opencensus` gem and the `google-cloud-trace` client library for the
-Stackdriver API, will be installed automatically as dependencies.
+Stackdriver API will be installed automatically as dependencies.
 
 ### Installing the plugin
 
