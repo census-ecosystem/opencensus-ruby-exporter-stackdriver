@@ -116,7 +116,7 @@ module OpenCensus
             warn "Unable to export to Stackdriver because: #{reason}"
           end
 
-          true
+          nil
         end
 
         ##
