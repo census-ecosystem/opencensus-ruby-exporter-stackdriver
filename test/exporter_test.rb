@@ -56,4 +56,26 @@ describe OpenCensus::Trace::Exporters::Stackdriver do
 
     mock_client.verify
   end
+
+  it "should not export an empty span list" do
+    mock_client = Minitest::Mock.new
+    # concurrent-ruby tests values against nil. Need to make sure the mock
+    # responds appropriately.
+    def mock_client.nil?; false; end
+
+    converter = OpenCensus::Trace::Exporters::Stackdriver::Converter.new project_id
+
+    exporter = OpenCensus::Trace::Exporters::Stackdriver.new \
+      project_id: project_id,
+      mock_client: mock_client
+
+    # Since mock_client doesn't expect the batch_write_spans method to be called, it should raise the NoMethodError if this happens
+    assert_nothing_raised NoMethodError do
+      exporter.export []
+    end
+    exporter.shutdown
+    exporter.wait_for_termination(2)
+
+    mock_client.verify
+  end
 end
