@@ -69,7 +69,8 @@ describe OpenCensus::Trace::Exporters::Stackdriver do
       project_id: project_id,
       mock_client: mock_client
 
-    # Since mock_client doesn't expect the batch_write_spans method to be called, it should raise the NoMethodError if this happens
+    # Since mock_client doesn't expect the batch_write_spans method to be 
+    # called, it should raise the NoMethodError if this happens
     exporter.export []
 
     exporter.shutdown
