@@ -108,6 +108,10 @@ module OpenCensus
         def export spans
           raise "Exporter is no longer running" unless @executor.running?
 
+          if spans.nil? || spans.empty?
+            return nil
+          end
+
           @client_promise.execute
           export_promise = @client_promise.then do |client|
             export_as_batch(client, spans)
