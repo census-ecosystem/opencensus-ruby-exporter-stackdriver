@@ -13,18 +13,15 @@ Gem::Specification.new do |spec|
   spec.homepage =    "https://github.com/census-instrumentation/ruby-stackdriver-exporter"
   spec.license =     "Apache-2.0"
 
-  spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.files = ::Dir.glob("lib/**/*.rb") +
+               ::Dir.glob("*.md") +
+               ["AUTHORS", "LICENSE", ".yardopts"]
   spec.require_paths = ["lib"]
-
   spec.required_ruby_version = ">= 2.2.0"
 
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "google-cloud-trace", "~> 0.30"
-  spec.add_dependency "opencensus", "~> 0.2"
+  spec.add_dependency "google-cloud-trace", "~> 0.31"
+  spec.add_dependency "opencensus", "~> 0.3"
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "faraday", "~> 0.13"
