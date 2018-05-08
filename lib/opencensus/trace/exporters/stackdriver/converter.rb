@@ -38,6 +38,21 @@ module OpenCensus
           TraceProtos = Google::Devtools::Cloudtrace::V2
 
           ##
+          # @private
+          # Attribute key for Stackdriver trace agent
+          #
+          AGENT_KEY = "g.co/agent".freeze
+
+          ##
+          # @private
+          # Attribute value for Stackdriver trace agent
+          #
+          AGENT_VALUE =
+            OpenCensus::Trace::TruncatableString.new \
+              "opencensus-ruby [#{::OpenCensus::VERSION}] ruby-stackdriver-" \
+              "exporter [#{::OpenCensus::Stackdriver::VERSION}]"
+
+          ##
           # Create a converter
           #
           # @param [String] project_id Google project ID
@@ -66,7 +81,8 @@ module OpenCensus
               end_time: convert_time(obj.end_time),
               attributes:
                 convert_attributes(obj.attributes,
-                                   obj.dropped_attributes_count),
+                                   obj.dropped_attributes_count,
+                                   include_agent_attribute: true),
               stack_trace:
                 convert_stack_trace(obj.stack_trace, obj.dropped_frames_count,
                                     obj.stack_trace_hash_id),
@@ -159,11 +175,17 @@ module OpenCensus
           #
           # @param [Hash] attributes The map of attribute values to convert
           # @param [Integer] dropped_attributes_count Number of dropped
+          # @param [Boolean] include_agent_attribute Include the `g.co/agent`
+          #     attribute in the result. Default is false.
           # @return [Google::Devtools::Cloudtrace::V2::Attributes] The
           #     generated proto
           #
-          def convert_attributes attributes, dropped_attributes_count
+          def convert_attributes attributes, dropped_attributes_count,
+                                 include_agent_attribute: false
             attribute_map = {}
+            if include_agent_attribute
+              attribute_map[AGENT_KEY] = convert_attribute_value AGENT_VALUE
+            end
             attributes.each do |k, v|
               attribute_map[k] = convert_attribute_value v
             end
