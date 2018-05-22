@@ -15,6 +15,7 @@
 require "test_helper"
 
 describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
+  let(:agent_key) { OpenCensus::Trace::Exporters::Stackdriver::Converter::AGENT_KEY }
   let(:project_id) { "my-project" }
   let(:converter) {
     OpenCensus::Trace::Exporters::Stackdriver::Converter.new project_id
@@ -105,6 +106,18 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
       proto.attribute_map["bool"].value.must_equal :bool_value
       proto.dropped_attributes_count.must_equal 2
     end
+
+    it "has include_agent_attribute default to false" do
+      input_attrs = {"str" => truncatable_string}
+      proto = converter.convert_attributes input_attrs, 2
+      proto.attribute_map[agent_key].must_be_nil
+    end
+
+    it "honors include_agent_attribute=true" do
+      input_attrs = {"str" => truncatable_string}
+      proto = converter.convert_attributes input_attrs, 2, include_agent_attribute: true
+      proto.attribute_map[agent_key].string_value.value.must_match(/^opencensus-ruby/)
+    end
   end
 
   describe "#convert_stack_frame" do
@@ -146,6 +159,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
       proto.annotation.attributes.dropped_attributes_count.must_equal 1
       proto.annotation.attributes.attribute_map["foo"].string_value.value.must_equal simple_string
       proto.annotation.attributes.attribute_map["foo"].string_value.truncated_byte_count.must_equal string_truncated_bytes
+      proto.annotation.attributes.attribute_map[agent_key].must_be_nil
       proto.time.seconds.must_equal 1001
     end
   end
@@ -231,6 +245,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
       proto.start_time.seconds.must_equal 1000
       proto.end_time.seconds.must_equal 2000
       proto.attributes.attribute_map["foo"].int_value.must_equal 123
+      proto.attributes.attribute_map[agent_key].string_value.value.must_match(/^opencensus-ruby/)
       proto.attributes.dropped_attributes_count.must_equal 1
       proto.stack_trace.stack_frames.frame[0].function_name.value.must_equal "foo"
       proto.stack_trace.stack_frames.dropped_frames_count.must_equal 2
