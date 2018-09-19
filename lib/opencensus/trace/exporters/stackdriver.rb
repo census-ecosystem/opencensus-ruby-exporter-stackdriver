@@ -191,7 +191,7 @@ module OpenCensus
         def create_executor max_threads, max_queue
           if max_threads >= 1
             Concurrent::ThreadPoolExecutor.new \
-              min_length: 1, max_length: max_threads,
+              min_threads: 1, max_threads: max_threads,
               max_queue: max_queue, fallback_policy: :caller_runs,
               auto_terminate: false
           else
