@@ -347,6 +347,7 @@ module OpenCensus
           #
           def convert_optional_status status
             return nil if status.nil?
+
             Google::Rpc::Status.new code: status.code, message: status.message
           end
 
@@ -358,6 +359,7 @@ module OpenCensus
           #
           def convert_optional_bool value
             return nil if value.nil?
+
             Google::Protobuf::BoolValue.new value: value
           end
 
@@ -369,6 +371,7 @@ module OpenCensus
           #
           def convert_optional_int32 value
             return nil if value.nil?
+
             Google::Protobuf::Int32Value.new value: value
           end
         end
