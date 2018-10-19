@@ -53,6 +53,20 @@ module OpenCensus
               "exporter [#{::OpenCensus::Stackdriver::VERSION}]"
 
           ##
+          # @private
+          # Mapping for certain well-known attributes defined in
+          # https://github.com/census-instrumentation/opencensus-specs/blob/master/trace/HTTP.md
+          #
+          ATTRIBUTE_NAME_MAPPING = {
+            "http.host" => "/http/host",
+            "http.method" => "/http/method",
+            "http.path" => "/http/path",
+            "http.route" => "/http/route",
+            "http.user_agent" => "/http/user_agent",
+            "http.status_code" => "/http/status_code"
+          }.freeze
+
+          ##
           # Create a converter
           #
           # @param [String] project_id Google project ID
@@ -171,6 +185,16 @@ module OpenCensus
           end
 
           ##
+          # Map OpenCensus attribute name to Stackdriver Trace name.
+          #
+          # @param [String] name OpenCensus attribute name
+          # @return [String] Corresponding Stackdriver Trace attribute.
+          #
+          def convert_attribute_name name
+            ATTRIBUTE_NAME_MAPPING[name] || name
+          end
+
+          ##
           # Convert an attributes hash
           #
           # @param [Hash] attributes The map of attribute values to convert
@@ -187,7 +211,8 @@ module OpenCensus
               attribute_map[AGENT_KEY] = convert_attribute_value AGENT_VALUE
             end
             attributes.each do |k, v|
-              attribute_map[k] = convert_attribute_value v
+              attribute_map[convert_attribute_name k] =
+                convert_attribute_value v
             end
             TraceProtos::Span::Attributes.new \
               attribute_map: attribute_map,

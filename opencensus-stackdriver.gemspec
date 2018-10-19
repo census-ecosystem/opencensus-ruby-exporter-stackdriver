@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-focus", "~> 1.1"
   spec.add_development_dependency "rails", "~> 5.1.4"
   spec.add_development_dependency "rake", "~> 12.0"
-  spec.add_development_dependency "rubocop", "~> 0.52"
+  spec.add_development_dependency "rubocop", "~> 0.59.2"
   spec.add_development_dependency "yard", "~> 0.9"
   spec.add_development_dependency "yard-doctest", "~> 0.1.6"
 end

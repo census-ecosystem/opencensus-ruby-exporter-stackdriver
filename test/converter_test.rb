@@ -107,6 +107,31 @@ describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
       proto.dropped_attributes_count.must_equal 2
     end
 
+    it "converts well-known attribute names" do
+      input_attrs = {
+        "http.host" => OpenCensus::Trace::TruncatableString.new("www.google.com"),
+        "http.method" => OpenCensus::Trace::TruncatableString.new("POST"),
+        "http.path" => OpenCensus::Trace::TruncatableString.new("/hello/world"),
+        "http.route" => OpenCensus::Trace::TruncatableString.new("/hello/:entity"),
+        "http.user_agent" => OpenCensus::Trace::TruncatableString.new("OpenCensus/1.0"),
+        "http.status_code" => 200
+      }
+      proto = converter.convert_attributes input_attrs, 2
+      proto.attribute_map["/http/host"].string_value.value.must_equal "www.google.com"
+      proto.attribute_map["/http/method"].string_value.value.must_equal "POST"
+      proto.attribute_map["/http/path"].string_value.value.must_equal "/hello/world"
+      proto.attribute_map["/http/route"].string_value.value.must_equal "/hello/:entity"
+      proto.attribute_map["/http/user_agent"].string_value.value.must_equal "OpenCensus/1.0"
+      proto.attribute_map["/http/status_code"].int_value.must_equal 200
+      proto.attribute_map["http.host"].must_be_nil
+      proto.attribute_map["http.method"].must_be_nil
+      proto.attribute_map["http.path"].must_be_nil
+      proto.attribute_map["http.route"].must_be_nil
+      proto.attribute_map["http.user_agent"].must_be_nil
+      proto.attribute_map["http.status_code"].must_be_nil
+      proto.dropped_attributes_count.must_equal 2
+    end
+
     it "has include_agent_attribute default to false" do
       input_attrs = {"str" => truncatable_string}
       proto = converter.convert_attributes input_attrs, 2
