@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 require "opencensus"
 
 module OpenCensus
-  ## Information about the Stackdriver exporter plugin
+  ##
+  # The Stackdriver exporter plugin for OpenCensus exports OpenCensus trace and
+  # stats information to Stackdriver Trace and Monitoring services.
+  #
+  # The Stackdriver Trace plugin for OpenCensus is implemented in the
+  # {OpenCensus::Trace::Exporters::Stackdriver} class.
+  #
   module Stackdriver
   end
 end

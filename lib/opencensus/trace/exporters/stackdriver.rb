@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 gem "google-cloud-trace"
 gem "concurrent-ruby"
 
@@ -20,7 +21,13 @@ require "google/cloud/trace"
 require "google/cloud/trace/v2"
 
 module OpenCensus
+  ##
+  # OpenCensus Trace provides a standard interface for distributed tracing.
+  #
   module Trace
+    ##
+    # The exporters module is a namespace for trace exporters.
+    #
     module Exporters
       ##
       # The Stackdriver exporter for OpenCensus Trace exports captured spans
