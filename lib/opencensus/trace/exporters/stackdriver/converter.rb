@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 require "google/devtools/cloudtrace/v2/trace_pb"
 require "google/protobuf/well_known_types"
 

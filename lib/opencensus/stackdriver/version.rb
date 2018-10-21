@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 module OpenCensus
   module Stackdriver
     ## Current OpenCensus Stackdriver plugin version
-    VERSION = "0.1.2".freeze
+    VERSION = "0.2.0".freeze
   end
 end

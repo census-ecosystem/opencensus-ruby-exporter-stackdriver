@@ -12,4 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+##
+# OpenCensus is a vendor-agnostic single distribution of libraries to provide
+# metrics collection and tracing for your services. See https://opencensus.io/
+# for general information on OpenCensus.
+#
+# The Stackdriver Trace plugin for OpenCensus is implemented in the
+# {OpenCensus::Trace::Exporters::Stackdriver} class.
+#
+module OpenCensus
+end
+
 require "opencensus/stackdriver"
