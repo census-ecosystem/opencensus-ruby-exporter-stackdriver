@@ -1,6 +1,6 @@
 # Release History
 
-### 0.2.0 / Unreleased
+### 0.2.0 / 2018-10-22
 
 This release requires version 0.4 or later of the opencensus gem.
 
