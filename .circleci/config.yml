@@ -55,4 +55,3 @@ workflows:
       - Test Ruby 2.3
       - Test Ruby 2.4
       - Test Ruby 2.5
-      - Test Ruby 2.6
