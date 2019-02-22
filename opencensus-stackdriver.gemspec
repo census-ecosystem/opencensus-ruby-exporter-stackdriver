@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "google-cloud-trace", "~> 0.33"
   spec.add_dependency "opencensus", "~> 0.4"
+  spec.add_dependency "google-cloud-monitoring", "~> 0.29.2"
 
   spec.add_development_dependency "bundler", ">= 1.17"
   spec.add_development_dependency "faraday", "~> 0.13"

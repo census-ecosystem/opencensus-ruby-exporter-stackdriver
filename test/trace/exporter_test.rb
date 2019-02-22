@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "test_helper"
+require_relative "../test_helper"
 
 describe OpenCensus::Trace::Exporters::Stackdriver do
   let(:project_id) { "my-project" }
@@ -69,7 +69,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver do
       project_id: project_id,
       mock_client: mock_client
 
-    # Since mock_client doesn't expect the batch_write_spans method to be 
+    # Since mock_client doesn't expect the batch_write_spans method to be
     # called, it should raise the NoMethodError if this happens
     exporter.export []
 

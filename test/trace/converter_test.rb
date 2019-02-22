@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "test_helper"
+require_relative "../test_helper"
 
 describe OpenCensus::Trace::Exporters::Stackdriver::Converter do
   let(:agent_key) { OpenCensus::Trace::Exporters::Stackdriver::Converter::AGENT_KEY }
