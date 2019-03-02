@@ -25,10 +25,10 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
     OpenCensus::Stats.create_last_value_aggregation
   }
   let(:columns1){
-    ["v1-column1", "v1-column2"]
+    ["v1column1", "v1column2"]
   }
   let(:columns2){
-    ["v2-column1", "v2-column2"]
+    ["v2column1", "v2column2"]
   }
   let(:view1){
     OpenCensus::Stats::View.new(

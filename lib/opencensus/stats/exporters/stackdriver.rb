@@ -122,16 +122,13 @@ module OpenCensus
               Concurrent::Promise.fulfill mock_client, executor: @executor
           else
             credentials = final_credentials credentials, scope
-            scope ||= Google::Cloud.configure.monitoring.scope
-            timeout ||= Google::Cloud.configure.monitoring.timeout
-            client_config ||= Google::Cloud.configure.monitoring.client_config
             @client_promise = create_client_promise \
               @executor, credentials, scope, client_config, timeout
           end
 
           @converter = Converter.new @project_id
           @project_path = Google::Cloud::Monitoring::V3:: \
-            MetricServiceClient.project_path project_id
+            MetricServiceClient.project_path @project_id
         end
 
         # Export stats to Monitoring service asynchronously.
@@ -292,7 +289,6 @@ module OpenCensus
         # Fall back to default project ID
         def final_project_id project_id
           project_id ||
-            Google::Cloud.configure.monitoring.project_id ||
             Google::Cloud.configure.project_id ||
             Google::Cloud.env.project_id
         end
@@ -300,11 +296,10 @@ module OpenCensus
         # Fall back to default credentials, and wrap in a creds object
         def final_credentials credentials, scope
           credentials ||=
-            Google::Cloud.configure.monitoring.credentials ||
             Google::Cloud.configure.credentials ||
-            Google::Cloud::Monitering::V3::Credentials.default(scope: scope)
+            Google::Cloud::Monitoring::V3::Credentials.default(scope: scope)
           unless credentials.is_a? Google::Auth::Credentials
-            credentials = Google::Cloud::Monitering::V3::Credentials.new(
+            credentials = Google::Cloud::Monitoring::V3::Credentials.new(
               credentials,
               scope: scope
             )
