@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright 2018 OpenCensus Authors
+# Copyright 2019 OpenCensus Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-require "google/devtools/cloudtrace/v2/trace_pb"
-require "google/protobuf/well_known_types"
 
 module OpenCensus
   module Stats
@@ -54,7 +51,7 @@ module OpenCensus
               labels: convert_labels(view.columns)
             )
 
-            descriptor.description ||= view.description
+            descriptor.description = view.description if view.description
             descriptor
           end
 
@@ -74,7 +71,7 @@ module OpenCensus
           # Convert to metric view type.
           #
           # @param [OpenCensus::Stats:View] view Stats view
-          # @param [Symbol]
+          # @return [Symbol] Metric value type
           #
           def convert_metric_value_type view
             case view.aggregation
@@ -99,11 +96,12 @@ module OpenCensus
           #   OpenCensus::Stats:Aggregation::Count,
           #   OpenCensus::Stats:Aggregation::Distribution] aggregation
           #   Aggregation type
-          # @param [Symbol]
+          # @return [Symbol] Metric kind type
           #
           def convert_metric_kind aggregation
-            if aggregation.instance_of? OpenCensus::Stats::Aggregation:: \
-              LastValue
+            last_value_class = OpenCensus::Stats::Aggregation::LastValue
+
+            if aggregation.instance_of? last_value_class
               return Google::Api::MetricDescriptor::MetricKind::GAUGE
             end
 
@@ -153,8 +151,8 @@ module OpenCensus
           # @param [Time] end_time Start time
           # @param [OpenCensus::Stats:Measure] measure Measure details
           # @param [OpenCensus::Stats:AggregationData] aggr_data Aggregated data
-          # @param [Google::Monitoring::V3::Point]
-          #
+          # @raise [TypeError] If invalid aggr data type.
+          # @return [Google::Monitoring::V3::Point]
           def convert_point start_time, end_time, measure, aggr_data
             case aggr_data
             when OpenCensus::Stats::AggregationData::Distribution
@@ -183,7 +181,7 @@ module OpenCensus
           # @param [Time] start_time Start time
           # @param [Time] end_time Start time
           # @param [OpenCensus::Stats::AggregationData::Distribution] aggr_data
-          # @param [Google::Monitoring::V3::Point]
+          # @return [Google::Monitoring::V3::Point]
           #
           def create_distribution_point start_time, end_time, aggr_data
             value = {
@@ -223,7 +221,7 @@ module OpenCensus
           # @param [Time] end_time Start time
           # @param [Integer, Float] value
           # @param [OpenCensus::Stats::Measure] measure Measure defination
-          # @param [Google::Monitoring::V3::Point]
+          # @return [Google::Monitoring::V3::Point]
           #
           def create_number_point start_time, end_time, value, measure
             value = if measure.int64?

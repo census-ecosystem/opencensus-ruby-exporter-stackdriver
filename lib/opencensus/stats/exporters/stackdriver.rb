@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright 2018 OpenCensus Authors
+# Copyright 2019 OpenCensus Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@ require "google/cloud/monitoring/v3"
 module OpenCensus
   ##
   # OpenCensus Stats provides a standard interface for distributed stats
-  # recoding.
+  # recording.
   #
   module Stats
     ##
-    # The exporters module is a namespace for trace exporters.
+    # The exporters module is a namespace for stats exporters.
     #
     module Exporters
       ##
-      # The Stackdriver exporter for OpenCensus Stats exporter captured stats
+      # The Stackdriver exporter for OpenCensus Stats exports captured stats
       # to a Google Monitoring project. It calls the Monitoring API in
       # a background thread pool.
       #
       class Stackdriver
         # Default custom opencensus domain name
-        # @return [Dtring]
+        # @return [String]
         CUSTOM_OPENCENSUS_DOMAIN = "custom.googleapis.com/opencensus"
 
-        # @private
-        # Global resouce type
+        # Default metric resouce type.
+        # @return [String]
         GLOBAL_RESOURCE_TYPE = "global"
 
         # The project ID
@@ -94,7 +94,9 @@ module OpenCensus
         # @param [Integer] auto_terminate_time The time in seconds allotted to
         #     complete any pending background requests when Ruby is exiting.
         # @param [String] metric_prefix Prefix for stackdriver metric.
-        # @param [String] resource_type Metric resource type
+        #   Default value set to {CUSTOM_OPENCENSUS_DOMAIN}
+        # @param [String] resource_type Metric resource type.
+        #   Default value set to {GLOBAL_RESOURCE_TYPE}
         #
         def initialize \
             project_id: nil,
