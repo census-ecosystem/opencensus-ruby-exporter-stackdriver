@@ -217,8 +217,6 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       distribution_value.count.must_equal 1
       distribution_value.mean.must_equal 1
       distribution_value.sum_of_squared_deviation.must_equal 0
-      # distribution_value.range.min.must_equal 1.0
-      # distribution_value.range.max.must_equal 1.0
       distribution_value.bucket_counts.must_equal [0, 1, 0, 0, 0]
       distribution_value.bucket_options.explicit_buckets.bounds.must_equal [0, 5, 10, 15]
     end

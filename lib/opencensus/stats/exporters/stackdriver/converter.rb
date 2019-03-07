@@ -196,15 +196,6 @@ module OpenCensus
               bucket_counts: [0].concat(aggr_data.bucket_counts)
             }
 
-            # NOTE: Un comment after suppport of range in time series
-            #  - timeSeries[0].points[0].distributionValue.range is
-            # not allowed: Distribution range is not yet supported
-            #
-            # value[:range] = {
-            #  min: aggr_data.min,
-            #  max: aggr_data.max
-            # }
-
             Google::Monitoring::V3::Point.new(
               interval: {
                 start_time: convert_time(start_time),
