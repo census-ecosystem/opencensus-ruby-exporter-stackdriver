@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-require_relative "test_helper"
+require "test_helper"
 
-class LibraryTest < Minitest::Test
-  def test_that_it_has_a_version_number
+describe OpenCensus::Stackdriver do
+  it "has a version number" do
     refute_nil ::OpenCensus::Stackdriver::VERSION
   end
 
-  def test_e2e
+  it "export traces to stackdriver sevice" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
     exporter = OpenCensus::Trace::Exporters::Stackdriver.new
     OpenCensus::Trace.configure do |config|
@@ -50,7 +50,7 @@ class LibraryTest < Minitest::Test
     end
   end
 
-  def test_create_metric_descriptor
+  it "create a metric descriptor" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
 
     exporter = OpenCensus::Stats::Exporters::Stackdriver.new(
@@ -79,7 +79,7 @@ class LibraryTest < Minitest::Test
     descriptor_delete_promise.value!
   end
 
-  def test_record_sum_stats
+  it "record sum stats and export" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
 
     exporter = OpenCensus::Stats::Exporters::Stackdriver.new
@@ -108,7 +108,7 @@ class LibraryTest < Minitest::Test
     OpenCensus::Stats.unset_recorder_context
   end
 
-  def test_record_last_value_stats
+  it "record last value stats and export" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
 
     exporter = OpenCensus::Stats::Exporters::Stackdriver.new
@@ -137,7 +137,7 @@ class LibraryTest < Minitest::Test
     OpenCensus::Stats.unset_recorder_context
   end
 
-  def test_record_count_stat
+  it "record count stats and export" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
 
     exporter = OpenCensus::Stats::Exporters::Stackdriver.new
@@ -166,7 +166,7 @@ class LibraryTest < Minitest::Test
     OpenCensus::Stats.unset_recorder_context
   end
 
-  def test_record_distribution_stat
+  it "record distribution stats and export" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
 
     exporter = OpenCensus::Stats::Exporters::Stackdriver.new
