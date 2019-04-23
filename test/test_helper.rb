@@ -17,3 +17,4 @@ require "opencensus/stackdriver"
 
 require "minitest/autorun"
 require "minitest/focus"
+require "securerandom"

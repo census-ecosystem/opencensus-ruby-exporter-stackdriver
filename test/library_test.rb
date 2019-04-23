@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 require "test_helper"
 
-class LibraryTest < Minitest::Test
-  def test_that_it_has_a_version_number
+describe OpenCensus::Stackdriver do
+  it "has a version number" do
     refute_nil ::OpenCensus::Stackdriver::VERSION
   end
 
-  def test_e2e
+  it "export traces to stackdriver sevice" do
     skip unless ENV["GOOGLE_CLOUD_PROJECT"]
     exporter = OpenCensus::Trace::Exporters::Stackdriver.new
     OpenCensus::Trace.configure do |config|
@@ -47,5 +48,150 @@ class LibraryTest < Minitest::Test
       end
       exporter.export root_context.build_contained_spans
     end
+  end
+
+  it "create a metric descriptor" do
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+
+    exporter = OpenCensus::Stats::Exporters::Stackdriver.new(
+      metric_prefix: "test.stackdriver.exporter",
+      resource_type: "stackdriver_stats_tests"
+    )
+
+    measure = OpenCensus::Stats.create_measure_int name: "size_#{SecureRandom.hex(8)}", unit: "kb"
+    sum_aggr = OpenCensus::Stats.create_sum_aggregation
+    columns = ["column1", "column2"]
+    view = OpenCensus::Stats::View.new(
+      name: "test_sd_exporter_#{SecureRandom.hex(4)}",
+      measure: measure,
+      aggregation: sum_aggr,
+      columns: columns
+    )
+
+    metric_descriptor = exporter.create_metric_descriptor view
+
+    client_promise = exporter.instance_variable_get("@client_promise")
+    client_promise.execute
+    descriptor_delete_promise = client_promise.then do |client|
+      client.delete_metric_descriptor(metric_descriptor.name)
+    end
+
+    descriptor_delete_promise.value!
+  end
+
+  it "record sum stats and export" do
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+
+    exporter = OpenCensus::Stats::Exporters::Stackdriver.new
+    OpenCensus::Stats.configure do |config|
+      config.exporter = exporter
+    end
+    measure = OpenCensus::Stats.create_measure_int(
+      name: "test_sd_exporter_sum_size",
+      unit: "kb"
+    )
+    view = OpenCensus::Stats::View.new(
+      name: "testview_sum",
+      measure: measure,
+      aggregation: OpenCensus::Stats.create_sum_aggregation,
+      columns: ["frontend"]
+    )
+
+    recorder = OpenCensus::Stats.ensure_recorder
+    recorder.register_view(view)
+    exporter.create_metric_descriptor view
+
+    measurement = measure.create_measurement value: 10, tags: {"frontend" => "mobile"}
+    recorder.record measurement
+    exporter.export recorder.views_data
+
+    OpenCensus::Stats.unset_recorder_context
+  end
+
+  it "record last value stats and export" do
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+
+    exporter = OpenCensus::Stats::Exporters::Stackdriver.new
+    OpenCensus::Stats.configure do |config|
+      config.exporter = exporter
+    end
+    measure = OpenCensus::Stats.create_measure_int(
+      name: "test_sd_exporter_last_value_size",
+      unit: "kb"
+    )
+    view = OpenCensus::Stats::View.new(
+      name: "testview_last_value",
+      measure: measure,
+      aggregation: OpenCensus::Stats.create_last_value_aggregation,
+      columns: ["frontend"]
+    )
+
+    recorder = OpenCensus::Stats.ensure_recorder
+    recorder.register_view(view)
+    exporter.create_metric_descriptor view
+
+    measurement = measure.create_measurement value: 15, tags: {"frontend" => "mobile"}
+    recorder.record measurement
+    exporter.export recorder.views_data
+
+    OpenCensus::Stats.unset_recorder_context
+  end
+
+  it "record count stats and export" do
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+
+    exporter = OpenCensus::Stats::Exporters::Stackdriver.new
+    OpenCensus::Stats.configure do |config|
+      config.exporter = exporter
+    end
+    measure = OpenCensus::Stats.create_measure_int(
+      name: "test_sd_exporter_count_size",
+      unit: "1"
+    )
+    view = OpenCensus::Stats::View.new(
+      name: "testview_count",
+      measure: measure,
+      aggregation: OpenCensus::Stats.create_count_aggregation,
+      columns: ["frontend"]
+    )
+
+    recorder = OpenCensus::Stats.ensure_recorder
+    recorder.register_view(view)
+    exporter.create_metric_descriptor view
+
+    measurement = measure.create_measurement value: 1, tags: {"frontend" => "mobile"}
+    recorder.record measurement
+    exporter.export recorder.views_data
+
+    OpenCensus::Stats.unset_recorder_context
+  end
+
+  it "record distribution stats and export" do
+    skip unless ENV["GOOGLE_CLOUD_PROJECT"]
+
+    exporter = OpenCensus::Stats::Exporters::Stackdriver.new
+    OpenCensus::Stats.configure do |config|
+      config.exporter = exporter
+    end
+    measure = OpenCensus::Stats.create_measure_int(
+      name: "test_sd_exporter_distribution_size",
+      unit: "1"
+    )
+    view = OpenCensus::Stats::View.new(
+      name: "testview_distribution",
+      measure: measure,
+      aggregation: OpenCensus::Stats.create_distribution_aggregation([1,5,10]),
+      columns: ["frontend"]
+    )
+
+    recorder = OpenCensus::Stats.ensure_recorder
+    recorder.register_view(view)
+    exporter.create_metric_descriptor view
+
+    measurement = measure.create_measurement value: 5, tags: {"frontend" => "mobile"}
+    recorder.record measurement
+    exporter.export recorder.views_data
+
+    OpenCensus::Stats.unset_recorder_context
   end
 end

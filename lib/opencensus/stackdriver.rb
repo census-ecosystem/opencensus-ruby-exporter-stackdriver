@@ -21,7 +21,8 @@ module OpenCensus
   # stats information to Stackdriver Trace and Monitoring services.
   #
   # The Stackdriver Trace plugin for OpenCensus is implemented in the
-  # {OpenCensus::Trace::Exporters::Stackdriver} class.
+  # {OpenCensus::Trace::Exporters::Stackdriver} class and
+  # {OpenCensus::Stats::Exporters::Stackdriver}
   #
   module Stackdriver
   end
@@ -30,3 +31,5 @@ end
 require "opencensus/stackdriver/version"
 require "opencensus/trace/exporters/stackdriver"
 require "opencensus/trace/exporters/stackdriver/converter"
+require "opencensus/stats/exporters/stackdriver"
+require "opencensus/stats/exporters/stackdriver/converter"
