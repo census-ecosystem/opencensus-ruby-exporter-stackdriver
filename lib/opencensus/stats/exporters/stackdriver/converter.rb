@@ -112,10 +112,12 @@ module OpenCensus
           #
           # @param [String] metric_prefix Metric prefix name
           # @param [String] resource_type Metric resource type
+          # @param [Hash<String,String>] resource_labels Metric resource labels
           # @param [OpenCensus::Stats::ViewData] view_data Stats view data
           # @return [Array[Google::Monitoring::V3::TimeSeries]]
           #
-          def convert_time_series metric_prefix, resource_type, view_data
+          def convert_time_series metric_prefix, resource_type, resource_labels,
+                                  view_data
             view = view_data.view
 
             view_data.data.map do |tag_values, aggr_data|
@@ -126,9 +128,7 @@ module OpenCensus
                 },
                 resource: {
                   type: resource_type,
-                  labels: {
-                    "project_id" => @project_id
-                  }
+                  labels: resource_labels
                 },
                 metric_kind: convert_metric_kind(view.aggregation),
                 value_type: convert_metric_value_type(view)

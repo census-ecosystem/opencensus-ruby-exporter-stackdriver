@@ -309,14 +309,16 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
 
       metric_prefix = "test-resource"
       resource_type = "test-resource"
-      series_list = converter.convert_time_series metric_prefix, resource_type, view_data
+      resource_labels = { "project_id" => project_id, "foo" => "bar" }
+      series_list = converter.convert_time_series metric_prefix, resource_type,
+                                                  resource_labels, view_data
       series_list.length.must_equal 1
 
       series = series_list.first
       series.metric.type.must_equal  "#{metric_prefix}/#{view.name}"
-      series.metric.labels.must_equal({"column2"=>"test2", "column1"=>"test1"})
+      assert_equal(series.metric.labels, {"column2"=>"test2", "column1"=>"test1"})
       series.resource.type.must_equal resource_type
-      series.resource.labels.must_equal("project_id" => project_id)
+      assert_equal(series.resource.labels, resource_labels)
       series.metric_kind.must_equal :GAUGE
       series.value_type.must_equal :DOUBLE
       series.points.length.must_equal 1
