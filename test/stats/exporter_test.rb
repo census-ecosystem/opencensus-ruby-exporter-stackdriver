@@ -27,6 +27,9 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
   let(:resource_type) {
     "test_resource-type"
   }
+  let(:resource_labels) {
+    { "project_id" => project_id, "foo" => "bar" }
+  }
   let(:measure1) {
     OpenCensus::Stats.create_measure_int name: "size_#{SecureRandom.hex(8)}", unit: "kb"
   }
@@ -80,7 +83,8 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
       view_data2.record measurement2
 
       expected_time_series_protos = [view_data1, view_data2].map do |view_data|
-        converter.convert_time_series metric_prefix, resource_type, view_data
+        converter.convert_time_series metric_prefix, resource_type,
+                                      resource_labels, view_data
       end
       expected_time_series_protos.flatten!
       mock_client.expect :create_time_series, nil, ["projects/#{project_id}", expected_time_series_protos]
@@ -89,6 +93,7 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
         project_id: project_id,
         metric_prefix: metric_prefix,
         resource_type: resource_type,
+        resource_labels: resource_labels,
         mock_client: mock_client
       )
 
@@ -109,6 +114,7 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
         project_id: project_id,
         metric_prefix: metric_prefix,
         resource_type: resource_type,
+        resource_labels: resource_labels,
         mock_client: mock_client
       )
 
@@ -134,6 +140,7 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
         project_id: project_id,
         metric_prefix: metric_prefix,
         resource_type: resource_type,
+        resource_labels: resource_labels,
         mock_client: mock_client
       )
 
@@ -163,6 +170,7 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
         project_id: project_id,
         metric_prefix: metric_prefix,
         resource_type: resource_type,
+        resource_labels: resource_labels,
         mock_client: mock_client
       )
 

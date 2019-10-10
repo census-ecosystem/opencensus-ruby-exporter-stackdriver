@@ -40,11 +40,11 @@ module OpenCensus
       class Stackdriver
         # Default custom opencensus domain name
         # @return [String]
-        CUSTOM_OPENCENSUS_DOMAIN = "custom.googleapis.com/opencensus"
+        CUSTOM_OPENCENSUS_DOMAIN = "custom.googleapis.com/opencensus".freeze
 
         # Default metric resouce type.
         # @return [String]
-        GLOBAL_RESOURCE_TYPE = "global"
+        GLOBAL_RESOURCE_TYPE = "global".freeze
 
         # The project ID
         # @return [String]
@@ -58,6 +58,10 @@ module OpenCensus
         # Metric resource type
         # @return [String]
         attr_reader :resource_type
+
+        # Metric resource labels
+        # @return [Hash<String,String>]
+        attr_reader :resource_labels
 
         # Create a Stackdriver exporter.
         #
@@ -97,6 +101,8 @@ module OpenCensus
         #   Default value set to {CUSTOM_OPENCENSUS_DOMAIN}
         # @param [String] resource_type Metric resource type.
         #   Default value set to {GLOBAL_RESOURCE_TYPE}
+        # @param [Hash<String,String>] resource_labels Metric resource labels.
+        #   Default value set to { "project_id" => project_id }
         #
         def initialize \
             project_id: nil,
@@ -109,10 +115,14 @@ module OpenCensus
             auto_terminate_time: 10,
             mock_client: nil,
             metric_prefix: nil,
-            resource_type: nil
+            resource_type: nil,
+            resource_labels: nil
           @project_id = final_project_id project_id
           @metric_prefix = metric_prefix || CUSTOM_OPENCENSUS_DOMAIN
           @resource_type = resource_type || GLOBAL_RESOURCE_TYPE
+          @resource_labels = resource_labels || {
+            "project_id" => @project_id
+          }
           @executor = create_executor max_threads, max_queue
 
           if auto_terminate_time
@@ -315,6 +325,7 @@ module OpenCensus
             @converter.convert_time_series(
               metric_prefix,
               resource_type,
+              resource_labels,
               view_data
             )
           end
