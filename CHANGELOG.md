@@ -1,5 +1,12 @@
 # Release History
 
+### 0.3.0 / 2019-10-14
+
+This release requires version 0.5 or later of the opencensus gem. It includes
+experimental support for exporting OpenCensus Stats to the Stackdriver
+Monitoring service. Note that Stats support is incomplete and there are known
+issues.
+
 ### 0.2.0 / 2018-10-22
 
 This release requires version 0.4 or later of the opencensus gem.

@@ -8,7 +8,8 @@ that exports data to [Stackdriver](https://cloud.google.com/stackdriver/).
 OpenCensus is a platform- and provider-agnostic framework for distributed
 tracing and stats collection. For more information, see https://opencensus.io.
 
-This library is in an alpha stage, and the API is subject to change.
+This library is in an alpha stage, and the API is subject to change. In
+particular, support for the Stats API is currently incomplete and experimental.
 
 ## Quick Start
 
