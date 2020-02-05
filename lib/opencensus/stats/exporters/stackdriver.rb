@@ -103,6 +103,9 @@ module OpenCensus
         #   Default value set to {GLOBAL_RESOURCE_TYPE}
         # @param [Hash<String,String>] resource_labels Metric resource labels.
         #   Default value set to { "project_id" => project_id }
+        # @param [String] gcm_service_address Override for the Google
+        #   Cloud Monitoring service hostname, or `nil` to leave as
+        #   the default.
         #
         def initialize \
             project_id: nil,
@@ -116,7 +119,8 @@ module OpenCensus
             mock_client: nil,
             metric_prefix: nil,
             resource_type: nil,
-            resource_labels: nil
+            resource_labels: nil,
+            gcm_service_address: nil
           @project_id = final_project_id project_id
           @metric_prefix = metric_prefix || CUSTOM_OPENCENSUS_DOMAIN
           @resource_type = resource_type || GLOBAL_RESOURCE_TYPE
@@ -135,7 +139,8 @@ module OpenCensus
           else
             credentials = final_credentials credentials, scope
             @client_promise = create_client_promise \
-              @executor, credentials, scope, client_config, timeout
+              @executor, credentials, scope, client_config, timeout,
+              gcm_service_address
           end
 
           @converter = Converter.new @project_id
@@ -274,7 +279,7 @@ module OpenCensus
         # we actually need it. This is important because if it is intialized
         # too early, before a fork, it can go into a bad state.
         def create_client_promise executor, credentials, scopes, client_config,
-                                  timeout
+                                  timeout, service_address
           Concurrent::Promise.new executor: executor do
             Google::Cloud::Monitoring::Metric.new(
               credentials: credentials,
@@ -282,7 +287,8 @@ module OpenCensus
               client_config: client_config,
               timeout: timeout,
               lib_name: "opencensus",
-              lib_version: OpenCensus::Stackdriver::VERSION
+              lib_version: OpenCensus::Stackdriver::VERSION,
+              service_address: service_address
             )
           end
         end
