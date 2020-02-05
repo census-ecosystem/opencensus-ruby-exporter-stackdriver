@@ -163,7 +163,7 @@ module OpenCensus
             export_as_batch(client, views_data)
           end
           export_promise.on_error do |reason|
-            warn "Unable to export to Monitering service because: #{reason}"
+            warn "Unable to export to Monitoring service because: #{reason}"
           end
 
           nil
