@@ -1,5 +1,9 @@
 # Release History
 
+### 0.3.1 / 2020-02-06
+
+* Support customizing the stackdriver service address
+
 ### 0.3.0 / 2019-10-14
 
 This release requires version 0.5 or later of the opencensus gem. It includes
