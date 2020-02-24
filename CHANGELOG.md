@@ -1,5 +1,9 @@
 # Release History
 
+### 0.3.2 / 2020-02-24
+
+* Update the google-cloud-trace and google-cloud-monitoring dependencies to versions that support service address override.
+
 ### 0.3.1 / 2020-02-06
 
 * Support customizing the stackdriver service address

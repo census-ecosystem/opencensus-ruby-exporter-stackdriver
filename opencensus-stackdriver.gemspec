@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.2.0"
 
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "google-cloud-trace", "~> 0.33"
+  spec.add_dependency "google-cloud-trace", "~> 0.35"
   spec.add_dependency "opencensus", "~> 0.5"
   spec.add_dependency "google-cloud-monitoring", "~> 0.32"
 
