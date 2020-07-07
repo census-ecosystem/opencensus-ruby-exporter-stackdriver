@@ -87,7 +87,7 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
                                       resource_labels, view_data
       end
       expected_time_series_protos.flatten!
-      mock_client.expect :create_time_series, nil, ["projects/#{project_id}", expected_time_series_protos]
+      mock_client.expect :create_time_series, nil, [name: "projects/#{project_id}", time_series: expected_time_series_protos]
 
       exporter = OpenCensus::Stats::Exporters::Stackdriver.new(
         project_id: project_id,
@@ -146,12 +146,12 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
 
       view = view1
       metric_descriptor = converter.convert_metric_descriptor view, metric_prefix
-      metric_name = Google::Cloud::Monitoring::V3::MetricServiceClient.metric_descriptor_path(
-        project_id,
-        metric_descriptor.type
+      metric_name = Google::Cloud::Monitoring::V3::MetricService::Paths.metric_descriptor_path(
+        project: project_id,
+        metric_descriptor: metric_descriptor.type
       )
 
-      mock_client.expect :create_metric_descriptor, nil, [metric_name, metric_descriptor]
+      mock_client.expect :create_metric_descriptor, nil, [name: metric_name, metric_descriptor: metric_descriptor]
 
       exporter.create_metric_descriptor view
       exporter.shutdown
@@ -176,18 +176,18 @@ describe OpenCensus::Stats::Exporters::Stackdriver do
 
       view = view1
       metric_descriptor = converter.convert_metric_descriptor view, metric_prefix
-      metric_name = Google::Cloud::Monitoring::V3::MetricServiceClient.metric_descriptor_path(
-        project_id,
-        metric_descriptor.type
+      metric_name = Google::Cloud::Monitoring::V3::MetricService::Paths.metric_descriptor_path(
+        project: project_id,
+        metric_descriptor: metric_descriptor.type
       )
 
       mock_client.expect :create_metric_descriptor, nil do |metric_name, metric_descriptor|
         raise "TEST ERROR - metric is alreay exists"
       end
 
-      proc {
+      assert_raises StandardError do
         exporter.create_metric_descriptor view
-      }.must_raise StandardError
+      end
 
       exporter.shutdown
       exporter.wait_for_termination(2)

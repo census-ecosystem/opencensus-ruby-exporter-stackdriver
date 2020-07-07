@@ -114,14 +114,14 @@ module OpenCensus
           # @param [String] resource_type Metric resource type
           # @param [Hash<String,String>] resource_labels Metric resource labels
           # @param [OpenCensus::Stats::ViewData] view_data Stats view data
-          # @return [Array[Google::Monitoring::V3::TimeSeries]]
+          # @return [Array[Google::Cloud::Monitoring::V3::TimeSeries]]
           #
           def convert_time_series metric_prefix, resource_type, resource_labels,
                                   view_data
             view = view_data.view
 
             view_data.data.map do |tag_values, aggr_data|
-              series = Google::Monitoring::V3::TimeSeries.new(
+              series = Google::Cloud::Monitoring::V3::TimeSeries.new(
                 metric: {
                   type: make_metric_type(metric_prefix, view.name),
                   labels: Hash[view.columns.zip tag_values]
@@ -152,7 +152,7 @@ module OpenCensus
           # @param [OpenCensus::Stats:Measure] measure Measure details
           # @param [OpenCensus::Stats:AggregationData] aggr_data Aggregated data
           # @raise [TypeError] If invalid aggr data type.
-          # @return [Google::Monitoring::V3::Point]
+          # @return [Google::Cloud::Monitoring::V3::Point]
           def convert_point start_time, end_time, measure, aggr_data
             case aggr_data
             when OpenCensus::Stats::AggregationData::Distribution
@@ -181,7 +181,7 @@ module OpenCensus
           # @param [Time] start_time Start time
           # @param [Time] end_time Start time
           # @param [OpenCensus::Stats::AggregationData::Distribution] aggr_data
-          # @return [Google::Monitoring::V3::Point]
+          # @return [Google::Cloud::Monitoring::V3::Point]
           #
           def create_distribution_point start_time, end_time, aggr_data
             value = {
@@ -196,7 +196,7 @@ module OpenCensus
               bucket_counts: [0].concat(aggr_data.bucket_counts)
             }
 
-            Google::Monitoring::V3::Point.new(
+            Google::Cloud::Monitoring::V3::Point.new(
               interval: {
                 start_time: convert_time(start_time),
                 end_time: convert_time(end_time)
@@ -212,7 +212,7 @@ module OpenCensus
           # @param [Time] end_time Start time
           # @param [Integer, Float] value
           # @param [OpenCensus::Stats::Measure] measure Measure defination
-          # @return [Google::Monitoring::V3::Point]
+          # @return [Google::Cloud::Monitoring::V3::Point]
           #
           def create_number_point start_time, end_time, value, measure
             value = if measure.int64?
@@ -221,7 +221,7 @@ module OpenCensus
                       { double_value: value }
                     end
 
-            Google::Monitoring::V3::Point.new(
+            Google::Cloud::Monitoring::V3::Point.new(
               interval: {
                 start_time: convert_time(start_time),
                 end_time: convert_time(end_time)

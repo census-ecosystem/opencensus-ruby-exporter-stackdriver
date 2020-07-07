@@ -36,7 +36,7 @@ module OpenCensus
           # @private
           # Alias for the V2 Cloudtrace protos namespace
           #
-          TraceProtos = Google::Devtools::Cloudtrace::V2
+          TraceProtos = Google::Cloud::Trace::V2
 
           ##
           # @private
@@ -83,7 +83,7 @@ module OpenCensus
           # Convert a span object.
           #
           # @param [OpenCensus::Trace::Span] obj OpenCensus span object
-          # @return [Google::Devtools::Cloudtrace::V2::Span] The generated
+          # @return [Google::Cloud::Trace::V2::Span] The generated
           #     proto
           #
           def convert_span obj
@@ -132,7 +132,7 @@ module OpenCensus
           # @param [String] str The string
           # @param [Integer] truncated_byte_count The number of bytes omitted.
           #     Defaults to 0.
-          # @return [Google::Devtools::Cloudtrace::V2::TruncatableString] The
+          # @return [Google::Cloud::Trace::V2::TruncatableString] The
           #     generated proto
           #
           def make_truncatable_string str, truncated_byte_count = 0
@@ -146,7 +146,7 @@ module OpenCensus
           #
           # @param [OpenCensus::Trace::TruncatableString] obj OpenCensus
           #     truncatable string object
-          # @return [Google::Devtools::Cloudtrace::V2::TruncatableString] The
+          # @return [Google::Cloud::Trace::V2::TruncatableString] The
           #     generated proto
           #
           def convert_truncatable_string obj
@@ -170,7 +170,7 @@ module OpenCensus
           #
           # @param [OpenCensus::Trace::TruncatableString, Integer, boolean]
           #     obj Object to convert
-          # @return [Google::Devtools::Cloudtrace::V2::AttributeValue] The
+          # @return [Google::Cloud::Trace::V2::AttributeValue] The
           #     generated proto
           #
           def convert_attribute_value obj
@@ -202,7 +202,7 @@ module OpenCensus
           # @param [Integer] dropped_attributes_count Number of dropped
           # @param [Boolean] include_agent_attribute Include the `g.co/agent`
           #     attribute in the result. Default is false.
-          # @return [Google::Devtools::Cloudtrace::V2::Attributes] The
+          # @return [Google::Cloud::Trace::V2::Attributes] The
           #     generated proto
           #
           def convert_attributes attributes, dropped_attributes_count,
@@ -225,7 +225,7 @@ module OpenCensus
           #
           # @param [Thread::Backtrace::Location] frame The backtrace element to
           #     convert
-          # @return [Google::Devtools::Cloudtrace::V2::StackTrace::StackFrame]
+          # @return [Google::Cloud::Trace::V2::StackTrace::StackFrame]
           #     The generated proto
           #
           def convert_stack_frame frame
@@ -242,7 +242,7 @@ module OpenCensus
           #     element array to convert
           # @param [Integer] dropped_frames_count Frames that were dropped
           # @param [Integer] stack_trace_hash_id Hash of the data
-          # @return [Google::Devtools::Cloudtrace::V2::StackTrace] The
+          # @return [Google::Cloud::Trace::V2::StackTrace] The
           #     generated proto
           #
           def convert_stack_trace backtrace, dropped_frames_count,
@@ -267,7 +267,7 @@ module OpenCensus
           # @param [OpenCensus::Trace::Annotation] annotation The annotation
           #     object to convert
           # @return
-          #     [Google::Devtools::Cloudtrace::V2::Span::TimeEvent::Annotation]
+          #     [Google::Cloud::Trace::V2::Span::TimeEvent::Annotation]
           #     The generated proto
           #
           def convert_annotation annotation
@@ -287,7 +287,7 @@ module OpenCensus
           # @param [OpenCensus::Trace::MessageEvent] message_event The message
           #     event object to convert
           # @return
-          #    [Google::Devtools::Cloudtrace::V2::Span::TimeEvent::MessageEvent]
+          #    [Google::Cloud::Trace::V2::Span::TimeEvent::MessageEvent]
           #    The generated proto
           #
           def convert_message_event message_event
@@ -297,7 +297,7 @@ module OpenCensus
                 id: message_event.id,
                 uncompressed_size_bytes: message_event.uncompressed_size,
                 compressed_size_bytes: message_event.compressed_size
-            Google::Devtools::Cloudtrace::V2::Span::TimeEvent.new \
+            TraceProtos::Span::TimeEvent.new \
               time: convert_time(message_event.time),
               message_event: message_event_proto
           end
@@ -311,7 +311,7 @@ module OpenCensus
           #     annotations
           # @param [Integer] dropped_message_events_count Number of dropped
           #     message events
-          # @return [Google::Devtools::Cloudtrace::V2::Span::TimeEvents] The
+          # @return [Google::Cloud::Trace::V2::Span::TimeEvents] The
           #     generated proto
           #
           def convert_time_events time_events, dropped_annotations_count,
@@ -336,7 +336,7 @@ module OpenCensus
           # Convert a link object
           #
           # @param [OpenCensus::Trace::Link] link The link object to convert
-          # @return [Google::Devtools::Cloudtrace::V2::Span::Link] The
+          # @return [Google::Cloud::Trace::V2::Span::Link] The
           #     generated proto
           #
           def convert_link link
@@ -355,7 +355,7 @@ module OpenCensus
           # @param [Array<OpenCensus::Trace::Link>] links The link objects to
           #     convert
           # @param [Integer] dropped_links_count Number of dropped links
-          # @return [Google::Devtools::Cloudtrace::V2::Span::Links] The
+          # @return [Google::Cloud::Trace::V2::Span::Links] The
           #     generated proto
           #
           def convert_links links, dropped_links_count

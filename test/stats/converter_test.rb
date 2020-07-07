@@ -122,76 +122,76 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
   describe "#convert_metric_value_type" do
     it "converts for distribution aggregation" do
       value_type = converter.convert_metric_value_type distribution_view
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::DISTRIBUTION
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::DISTRIBUTION
     end
 
     it "converts for count aggregation" do
       value_type = converter.convert_metric_value_type count_view
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::INT64
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::INT64
     end
 
     it "converts for sum aggregation with int measure" do
       value_type = converter.convert_metric_value_type sum_view_int
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::INT64
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::INT64
     end
 
     it "converts for sum aggregation with double measure" do
       value_type = converter.convert_metric_value_type sum_view_double
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::DOUBLE
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::DOUBLE
     end
 
     it "converts for last value aggregation with int measure" do
       value_type = converter.convert_metric_value_type last_value_view_int
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::INT64
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::INT64
     end
 
     it "converts for last value aggregation with double measure" do
       value_type = converter.convert_metric_value_type last_value_view_double
-      value_type.must_equal Google::Api::MetricDescriptor::ValueType::DOUBLE
+      _(value_type).must_equal Google::Api::MetricDescriptor::ValueType::DOUBLE
     end
   end
 
   describe "#convert_metric_kind" do
     it "converts for last value aggregation" do
       metric_kind = converter.convert_metric_kind last_value_aggr
-      metric_kind.must_equal Google::Api::MetricDescriptor::MetricKind::GAUGE
+      _(metric_kind).must_equal Google::Api::MetricDescriptor::MetricKind::GAUGE
     end
 
     it "converts for distribution aggregation" do
       metric_kind = converter.convert_metric_kind distribution_aggr
-      metric_kind.must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
+      _(metric_kind).must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
     end
 
     it "converts for sum aggregation" do
       metric_kind = converter.convert_metric_kind sum_aggr
-      metric_kind.must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
+      _(metric_kind).must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
     end
 
     it "converts for count aggregation" do
       metric_kind = converter.convert_metric_kind count_aggr
-      metric_kind.must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
+      _(metric_kind).must_equal Google::Api::MetricDescriptor::MetricKind::CUMULATIVE
     end
   end
 
   describe "#make_metric_type" do
     it "build metric type" do
       path = converter.make_metric_type metric_prefix, "testname"
-      path.must_equal "#{metric_prefix}/testname"
+      _(path).must_equal "#{metric_prefix}/testname"
     end
   end
 
   describe "#convert_metric_descriptor" do
     it "converts for distribution aggregation" do
       descriptor = converter.convert_metric_descriptor view, metric_prefix
-      descriptor.type.must_equal "#{metric_prefix}/#{view.name}"
-      descriptor.display_name.must_equal view.measure.name
-      descriptor.metric_kind.must_equal :GAUGE
-      descriptor.value_type.must_equal :DOUBLE
-      descriptor.unit.must_equal unit
+      _(descriptor.type).must_equal "#{metric_prefix}/#{view.name}"
+      _(descriptor.display_name).must_equal view.measure.name
+      _(descriptor.metric_kind).must_equal :GAUGE
+      _(descriptor.value_type).must_equal :DOUBLE
+      _(descriptor.unit).must_equal unit
 
       descriptor.labels.each_with_index do |label, index|
-        label.key.must_equal view_columns[index]
-        label.value_type.must_equal :STRING
+        _(label.key).must_equal view_columns[index]
+        _(label.value_type).must_equal :STRING
       end
     end
   end
@@ -210,15 +210,15 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
         distribution_aggr_data
       )
 
-      point.interval.start_time.to_time.must_equal start_time
-      point.interval.end_time.to_time.must_equal end_time
+      _(point.interval.start_time.to_time).must_equal start_time
+      _(point.interval.end_time.to_time).must_equal end_time
 
       distribution_value = point.value.distribution_value
-      distribution_value.count.must_equal 1
-      distribution_value.mean.must_equal 1
-      distribution_value.sum_of_squared_deviation.must_equal 0
-      distribution_value.bucket_counts.must_equal [0, 1, 0, 0, 0]
-      distribution_value.bucket_options.explicit_buckets.bounds.must_equal [0, 5, 10, 15]
+      _(distribution_value.count).must_equal 1
+      _(distribution_value.mean).must_equal 1
+      _(distribution_value.sum_of_squared_deviation).must_equal 0
+      _(distribution_value.bucket_counts).must_equal [0, 1, 0, 0, 0]
+      _(distribution_value.bucket_options.explicit_buckets.bounds).must_equal [0, 5, 10, 15]
     end
   end
 
@@ -229,9 +229,9 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
 
       point = converter.create_number_point start_time, end_time, 100, measure_int
 
-      point.interval.start_time.to_time.must_equal start_time
-      point.interval.end_time.to_time.must_equal end_time
-      point.value.int64_value.must_equal 100
+      _(point.interval.start_time.to_time).must_equal start_time
+      _(point.interval.end_time.to_time).must_equal end_time
+      _(point.value.int64_value).must_equal 100
     end
 
     it "create a point object with double type" do
@@ -240,9 +240,9 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
 
       point = converter.create_number_point start_time, end_time, 10.1, measure_double
 
-      point.interval.start_time.to_time.must_equal start_time
-      point.interval.end_time.to_time.must_equal end_time
-      point.value.double_value.must_equal 10.1
+      _(point.interval.start_time.to_time).must_equal start_time
+      _(point.interval.end_time.to_time).must_equal end_time
+      _(point.value.double_value).must_equal 10.1
     end
   end
 
@@ -256,8 +256,8 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       aggr_data = view_data.data.values.first
 
       point = converter.convert_point view_data.start_time, aggr_data.time, view.measure, aggr_data
-      point.interval.start_time.must_equal point.interval.end_time
-      point.value.double_value.must_equal 10.0
+      _(point.interval.start_time).must_equal point.interval.end_time
+      _(point.value.double_value).must_equal 10.0
     end
 
     it "converts count aggregation data to point" do
@@ -269,8 +269,8 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       aggr_data = view_data.data.values.first
 
       point = converter.convert_point view_data.start_time, aggr_data.time, view.measure, aggr_data
-      point.interval.end_time.to_time.must_be :>, point.interval.start_time.to_time
-      point.value.int64_value.wont_be_nil
+      _(point.interval.end_time.to_time).must_be :>, point.interval.start_time.to_time
+      _(point.value.int64_value).wont_be_nil
     end
 
     it "converts sum aggregation data to point" do
@@ -282,8 +282,8 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       aggr_data = view_data.data.values.first
 
       point = converter.convert_point view_data.start_time, aggr_data.time, view.measure, aggr_data
-      point.interval.end_time.to_time.must_be :>, point.interval.start_time.to_time
-      point.value.int64_value.wont_be_nil
+      _(point.interval.end_time.to_time).must_be :>, point.interval.start_time.to_time
+      _(point.value.int64_value).wont_be_nil
     end
 
     it "converts distribution aggregation data to point" do
@@ -295,8 +295,8 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       aggr_data = view_data.data.values.first
 
       point = converter.convert_point view_data.start_time, aggr_data.time, view.measure, aggr_data
-      point.interval.end_time.to_time.must_be :>, point.interval.start_time.to_time
-      point.value.distribution_value.wont_be_nil
+      _(point.interval.end_time.to_time).must_be :>, point.interval.start_time.to_time
+      _(point.value.distribution_value).wont_be_nil
     end
   end
 
@@ -312,18 +312,18 @@ describe OpenCensus::Stats::Exporters::Stackdriver::Converter do
       resource_labels = { "project_id" => project_id, "foo" => "bar" }
       series_list = converter.convert_time_series metric_prefix, resource_type,
                                                   resource_labels, view_data
-      series_list.length.must_equal 1
+      _(series_list.length).must_equal 1
 
       series = series_list.first
-      series.metric.type.must_equal  "#{metric_prefix}/#{view.name}"
+      _(series.metric.type).must_equal  "#{metric_prefix}/#{view.name}"
       assert_equal(series.metric.labels, {"column2"=>"test2", "column1"=>"test1"})
-      series.resource.type.must_equal resource_type
+      _(series.resource.type).must_equal resource_type
       assert_equal(series.resource.labels, resource_labels)
-      series.metric_kind.must_equal :GAUGE
-      series.value_type.must_equal :DOUBLE
-      series.points.length.must_equal 1
-      series.points.first.interval.wont_be_nil
-      series.points.first.value.double_value.must_equal 10.0
+      _(series.metric_kind).must_equal :GAUGE
+      _(series.value_type).must_equal :DOUBLE
+      _(series.points.length).must_equal 1
+      _(series.points.first.interval).wont_be_nil
+      _(series.points.first.value.double_value).must_equal 10.0
     end
   end
 end

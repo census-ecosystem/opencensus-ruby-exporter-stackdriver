@@ -13,11 +13,11 @@
 # limitations under the License.
 
 
-gem "google-cloud-trace"
+gem "google-cloud-trace-v2"
 gem "concurrent-ruby"
 
 require "concurrent"
-require "google/cloud/trace"
+require "google/cloud/env"
 require "google/cloud/trace/v2"
 
 module OpenCensus
@@ -56,8 +56,7 @@ module OpenCensus
         #     Optional. Most applications can leave this set to the default.
         # @param [Integer] timeout The default timeout for API requests, in
         #     seconds. Optional.
-        # @param [Hash] client_config An optional set of additional
-        #     configuration values for the API connection.
+        # @param [Hash] client_config Unused.
         # @param [Integer] max_queue The maximum number of API requests that
         #     can be queued for background operation. If the queue exceeds this
         #     value, additional requests will be run in the calling thread
@@ -75,12 +74,12 @@ module OpenCensus
             credentials: nil,
             scope: nil,
             timeout: nil,
-            client_config: nil,
+            client_config: nil, # rubocop:disable Lint/UnusedMethodArgument
             max_queue: 1000,
             max_threads: 1,
             auto_terminate_time: 10,
             mock_client: nil
-          @project_id = final_project_id project_id
+          @project_id = project_id || ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
 
           @executor = create_executor max_threads, max_queue
           if auto_terminate_time
@@ -91,12 +90,8 @@ module OpenCensus
             @client_promise =
               Concurrent::Promise.fulfill mock_client, executor: @executor
           else
-            credentials = final_credentials credentials, scope
-            scope ||= Google::Cloud.configure.trace.scope
-            timeout ||= Google::Cloud.configure.trace.timeout
-            client_config ||= Google::Cloud.configure.trace.client_config
             @client_promise = create_client_promise \
-              @executor, credentials, scope, client_config, timeout
+              @executor, credentials, scope, timeout
           end
         end
 
@@ -210,17 +205,15 @@ module OpenCensus
         # We create the client lazily so grpc doesn't get initialized until
         # we actually need it. This is important because if it is intialized
         # too early, before a fork, it can go into a bad state.
-        def create_client_promise executor, credentials, scopes, client_config,
-                                  timeout
+        def create_client_promise executor, credentials, scopes, timeout
           Concurrent::Promise.new executor: executor do
-            Google::Cloud::Trace::V2.new(
-              credentials: credentials,
-              scopes: scopes,
-              client_config: client_config,
-              timeout: timeout,
-              lib_name: "opencensus",
-              lib_version: OpenCensus::Stackdriver::VERSION
-            )
+            Google::Cloud::Trace::V2::TraceService::Client.new do |config|
+              config.credentials = credentials if credentials
+              config.scope = scopes if scopes
+              config.timeout = timeout if timeout
+              config.lib_name = "opencensus"
+              config.lib_version = OpenCensus::Stackdriver::VERSION
+            end
           end
         end
 
@@ -235,32 +228,12 @@ module OpenCensus
           end
         end
 
-        # Fall back to default project ID
-        def final_project_id project_id
-          project_id ||
-            Google::Cloud.configure.trace.project_id ||
-            Google::Cloud.configure.project_id ||
-            Google::Cloud.env.project_id
-        end
-
-        # Fall back to default credentials, and wrap in a creds object
-        def final_credentials credentials, scope
-          credentials ||=
-            Google::Cloud.configure.trace.credentials ||
-            Google::Cloud.configure.credentials ||
-            Google::Cloud::Trace::Credentials.default(scope: scope)
-          unless credentials.is_a? Google::Auth::Credentials
-            credentials =
-              Google::Cloud::Trace::Credentials.new credentials, scope: scope
-          end
-          credentials
-        end
-
         # Export a list of spans in a single batch write, in the current thread
         def export_as_batch client, spans
           converter = Converter.new project_id
           span_protos = Array(spans).map { |span| converter.convert_span span }
-          client.batch_write_spans "projects/#{project_id}", span_protos
+          client.batch_write_spans name: "projects/#{project_id}",
+                                   spans: span_protos
         end
       end
     end

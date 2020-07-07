@@ -44,7 +44,7 @@ describe OpenCensus::Trace::Exporters::Stackdriver do
 
     converter = OpenCensus::Trace::Exporters::Stackdriver::Converter.new project_id
     expected_span_protos = [span1, span2].map { |span| converter.convert_span span }
-    mock_client.expect :batch_write_spans, nil, ["projects/my-project", expected_span_protos]
+    mock_client.expect :batch_write_spans, nil, [name: "projects/my-project", spans: expected_span_protos]
 
     exporter = OpenCensus::Trace::Exporters::Stackdriver.new \
       project_id: project_id,

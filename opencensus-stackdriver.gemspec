@@ -20,13 +20,14 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.2.0"
 
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "google-cloud-trace", "~> 0.35"
+  spec.add_dependency "google-cloud-env", "~> 1.3"
+  spec.add_dependency "google-cloud-monitoring-v3", "~> 0.1"
+  spec.add_dependency "google-cloud-trace-v2", "~> 0.1"
   spec.add_dependency "opencensus", "~> 0.5"
-  spec.add_dependency "google-cloud-monitoring", "~> 0.32"
 
   spec.add_development_dependency "bundler", ">= 1.17"
   spec.add_development_dependency "faraday", "~> 0.13"
-  spec.add_development_dependency "minitest", "~> 5.0"
+  spec.add_development_dependency "minitest", "~> 5.14"
   spec.add_development_dependency "minitest-focus", "~> 1.1"
   spec.add_development_dependency "rails", "~> 5.1.4"
   spec.add_development_dependency "rake", "~> 12.0"
