@@ -15,11 +15,11 @@
 # limitations under the License.
 
 
-gem "google-cloud-monitoring"
+gem "google-cloud-monitoring-v3"
 gem "concurrent-ruby"
 
 require "concurrent"
-require "google/cloud/monitoring"
+require "google/cloud/env"
 require "google/cloud/monitoring/v3"
 
 module OpenCensus
@@ -112,7 +112,7 @@ module OpenCensus
             credentials: nil,
             scope: nil,
             timeout: nil,
-            client_config: nil,
+            client_config: nil, # rubocop:disable Lint/UnusedMethodArgument
             max_queue: 1000,
             max_threads: 1,
             auto_terminate_time: 10,
@@ -121,7 +121,7 @@ module OpenCensus
             resource_type: nil,
             resource_labels: nil,
             gcm_service_address: nil
-          @project_id = final_project_id project_id
+          @project_id = project_id || ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
           @metric_prefix = metric_prefix || CUSTOM_OPENCENSUS_DOMAIN
           @resource_type = resource_type || GLOBAL_RESOURCE_TYPE
           @resource_labels = resource_labels || {
@@ -137,15 +137,13 @@ module OpenCensus
             @client_promise =
               Concurrent::Promise.fulfill mock_client, executor: @executor
           else
-            credentials = final_credentials credentials, scope
             @client_promise = create_client_promise \
-              @executor, credentials, scope, client_config, timeout,
-              gcm_service_address
+              @executor, credentials, scope, timeout, gcm_service_address
           end
 
           @converter = Converter.new @project_id
-          @project_path = Google::Cloud::Monitoring::V3:: \
-            MetricServiceClient.project_path @project_id
+          paths = Google::Cloud::Monitoring::V3::MetricService::Paths
+          @project_path = paths.project_path project: @project_id
         end
 
         # Export stats to Monitoring service asynchronously.
@@ -247,15 +245,16 @@ module OpenCensus
             view,
             metric_prefix
           )
-          metric_name = Google::Cloud::Monitoring::V3:: \
-            MetricServiceClient.metric_descriptor_path(
-              project_id,
-              metric_descriptor.type
-            )
+          paths = Google::Cloud::Monitoring::V3::MetricService::Paths
+          metric_name = paths.metric_descriptor_path(
+            project: project_id,
+            metric_descriptor: metric_descriptor.type
+          )
 
           @client_promise.execute
           descriptor_create_promise = @client_promise.then do |client|
-            client.create_metric_descriptor metric_name, metric_descriptor
+            client.create_metric_descriptor name: metric_name,
+                                            metric_descriptor: metric_descriptor
           end
           descriptor_create_promise.value!
         end
@@ -278,18 +277,17 @@ module OpenCensus
         # We create the client lazily so grpc doesn't get initialized until
         # we actually need it. This is important because if it is intialized
         # too early, before a fork, it can go into a bad state.
-        def create_client_promise executor, credentials, scopes, client_config,
+        def create_client_promise executor, credentials, scopes,
                                   timeout, service_address
           Concurrent::Promise.new executor: executor do
-            Google::Cloud::Monitoring::Metric.new(
-              credentials: credentials,
-              scopes: scopes,
-              client_config: client_config,
-              timeout: timeout,
-              lib_name: "opencensus",
-              lib_version: OpenCensus::Stackdriver::VERSION,
-              service_address: service_address
-            )
+            Google::Cloud::Monitoring::V3::MetricService::Client.new do |config|
+              config.credentials = credentials if credentials
+              config.scope = scopes if scopes
+              config.timeout = timeout if timeout
+              config.endpoint = service_address if service_address
+              config.lib_name = "opencensus"
+              config.lib_version = OpenCensus::Stackdriver::VERSION
+            end
           end
         end
 
@@ -304,27 +302,6 @@ module OpenCensus
           end
         end
 
-        # Fall back to default project ID
-        def final_project_id project_id
-          project_id ||
-            Google::Cloud.configure.project_id ||
-            Google::Cloud.env.project_id
-        end
-
-        # Fall back to default credentials, and wrap in a creds object
-        def final_credentials credentials, scope
-          credentials ||=
-            Google::Cloud.configure.credentials ||
-            Google::Cloud::Monitoring::V3::Credentials.default(scope: scope)
-          unless credentials.is_a? Google::Auth::Credentials
-            credentials = Google::Cloud::Monitoring::V3::Credentials.new(
-              credentials,
-              scope: scope
-            )
-          end
-          credentials
-        end
-
         # Export a list of stats in the current thread
         def export_as_batch client, views_data
           time_series = views_data.map do |view_data|
@@ -336,7 +313,8 @@ module OpenCensus
             )
           end
 
-          client.create_time_series @project_path, time_series.flatten!
+          client.create_time_series name: @project_path,
+                                    time_series: time_series.flatten
         end
       end
     end
