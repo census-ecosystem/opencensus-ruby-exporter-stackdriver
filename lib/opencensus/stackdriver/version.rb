@@ -16,6 +16,6 @@
 module OpenCensus
   module Stackdriver
     ## Current OpenCensus Stackdriver plugin version
-    VERSION = "0.3.2".freeze
+    VERSION = "0.4.0".freeze
   end
 end

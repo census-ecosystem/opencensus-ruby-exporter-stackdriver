@@ -1,5 +1,10 @@
 # Release History
 
+### 0.4.0 / 2020-07-23
+
+* Update for compatibility with changes to the google-cloud-trace and google-cloud-monitoring library structure.
+* Requires Ruby 2.4 or later.
+
 ### 0.3.2 / 2020-02-24
 
 * Update the google-cloud-trace and google-cloud-monitoring dependencies to versions that support service address override.
