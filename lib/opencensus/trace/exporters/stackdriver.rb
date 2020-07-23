@@ -79,8 +79,9 @@ module OpenCensus
             max_threads: 1,
             auto_terminate_time: 10,
             mock_client: nil
-          @project_id = project_id || ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
-
+          @project_id = project_id ||
+                        ENV["GOOGLE_CLOUD_PROJECT"] ||
+                        Google::Cloud.env.project_id
           @executor = create_executor max_threads, max_queue
           if auto_terminate_time
             terminate_at_exit! @executor, auto_terminate_time

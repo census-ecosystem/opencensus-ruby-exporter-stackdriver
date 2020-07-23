@@ -121,7 +121,9 @@ module OpenCensus
             resource_type: nil,
             resource_labels: nil,
             gcm_service_address: nil
-          @project_id = project_id || ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
+          @project_id = project_id ||
+                        ENV["GOOGLE_CLOUD_PROJECT"] ||
+                        Google::Cloud.env.project_id
           @metric_prefix = metric_prefix || CUSTOM_OPENCENSUS_DOMAIN
           @resource_type = resource_type || GLOBAL_RESOURCE_TYPE
           @resource_labels = resource_labels || {
