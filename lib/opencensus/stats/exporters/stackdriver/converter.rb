@@ -159,8 +159,8 @@ module OpenCensus
               create_distribution_point start_time, end_time, aggr_data
             when OpenCensus::Stats::AggregationData::LastValue
               create_number_point(
-                start_time,
-                start_time,
+                end_time,
+                end_time,
                 aggr_data.value,
                 measure
               )
