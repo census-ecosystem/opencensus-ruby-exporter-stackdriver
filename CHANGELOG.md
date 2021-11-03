@@ -1,5 +1,9 @@
 # Release History
 
+### 0.4.1 / 2021-11-03
+
+* Fix: Use the AggregationData timestamp when exporting unchanged gauge values
+
 ### 0.4.0 / 2020-07-23
 
 * Update for compatibility with changes to the google-cloud-trace and google-cloud-monitoring library structure.
